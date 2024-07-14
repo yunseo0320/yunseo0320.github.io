@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Calculation</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        function calculateColors() {
+            var birthdate = document.getElementById('birthdate').value;
+
+            axios.post('/calculate', { birthdate: birthdate })
+                .then(function (response) {
+                    var data = response.data;
+                    var resultElement = document.getElementById('result');
+                    resultElement.innerHTML = `
+                        <h2>생년월일에 따른 컬러 결과</h2>
+                        <p>첫 번째 컬러: ${data.first_color_name_1}-${data.first_color_name_2} 
+                            <span style="color: ${data.first_color_color_1}; background-color: ${data.first_color_color_2}; padding: 5px;">
+                                예시 텍스트
+                            </span>
+                        </p>
+                        <p>두 번째 컬러: ${data.second_color_name_1}-${data.second_color_name_2} 
+                            <span style="color: ${data.second_color_color_1}; background-color: ${data.second_color_color_2}; padding: 5px;">
+                                예시 텍스트
+                            </span>
+                        </p>
+                        <p>세 번째 컬러: ${data.third_color_name_1}-${data.third_color_name_2} 
+                            <span style="color: ${data.third_color_color_1}; background-color: ${data.third_color_color_2}; padding: 5px;">
+                                예시 텍스트
+                            </span>
+                        </p>
+                    `;
+                })
+                .catch(function (error) {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</head>
+<body>
+    <div>
+        <label for="birthdate">생년월일(YYYYMMDD):</label>
+        <input type="text" id="birthdate" name="birthdate" pattern="[0-9]{8}" title="8자리 숫자를 입력하세요 (예: 20230101)" required>
+        <br><br>
+        <button type="button" onclick="calculateColors()">계산하기</button>
+    </div>
+    
+    <div id="result"></div>
+</body>
+</html>
