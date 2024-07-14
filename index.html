@@ -5,32 +5,123 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Color Calculation</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .color-box {
+            display: inline-block;
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            text-align: center;
+            line-height: 100px;
+            color: #fff;
+            font-weight: bold;
+        }
+        .results-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .results-table th, .results-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .results-table th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+        .color-name-box {
+            display: inline-block;
+            width: 80px;
+            height: 30px;
+            line-height: 30px;
+            margin: 0 5px;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+        }
+    </style>
     <script>
         function calculateColors() {
             var birthdate = document.getElementById('birthdate').value;
+            var apiUrl = 'https://your-heroku-app-name.herokuapp.com/calculate'; // Heroku 앱 URL 사용
 
-            axios.post('/calculate', { birthdate: birthdate })
+            axios.post(apiUrl, { birthdate: birthdate })
                 .then(function (response) {
                     var data = response.data;
                     var resultElement = document.getElementById('result');
                     resultElement.innerHTML = `
                         <h2>생년월일에 따른 컬러 결과</h2>
-                        <p>첫 번째 컬러: ${data.first_color_name_1}-${data.first_color_name_2} 
-                            <span style="color: ${data.first_color_color_1}; background-color: ${data.first_color_color_2}; padding: 5px;">
-                                예시 텍스트
-                            </span>
-                        </p>
-                        <p>두 번째 컬러: ${data.second_color_name_1}-${data.second_color_name_2} 
-                            <span style="color: ${data.second_color_color_1}; background-color: ${data.second_color_color_2}; padding: 5px;">
-                                예시 텍스트
-                            </span>
-                        </p>
-                        <p>세 번째 컬러: ${data.third_color_name_1}-${data.third_color_name_2} 
-                            <span style="color: ${data.third_color_color_1}; background-color: ${data.third_color_color_2}; padding: 5px;">
-                                예시 텍스트
-                            </span>
-                        </p>
+                        <p>첫 번째 컬러:</p>
+                        <div>
+                            <div class="color-box" style="background-color: ${data.first_color_color_1};">
+                                ${data.first_color_name_1}
+                            </div>
+                            <div class="color-box" style="background-color: ${data.first_color_color_2};">
+                                ${data.first_color_name_2}
+                            </div>
+                        </div>
+                        <p>두 번째 컬러:</p>
+                        <div>
+                            <div class="color-box" style="background-color: ${data.second_color_color_1};">
+                                ${data.second_color_name_1}
+                            </div>
+                            <div class="color-box" style="background-color: ${data.second_color_color_2};">
+                                ${data.second_color_name_2}
+                            </div>
+                        </div>
+                        <p>세 번째 컬러:</p>
+                        <div>
+                            <div class="color-box" style="background-color: ${data.third_color_color_1};">
+                                ${data.third_color_name_1}
+                            </div>
+                            <div class="color-box" style="background-color: ${data.third_color_color_2};">
+                                ${data.third_color_name_2}
+                            </div>
+                        </div>
                     `;
+                })
+                .catch(function (error) {
+                    console.error('Error:', error);
+                });
+        }
+
+        function showAllResults() {
+            var apiUrl = 'https://your-heroku-app-name.herokuapp.com/all_results'; // Heroku 앱 URL 사용
+            axios.get(apiUrl)
+                .then(function (response) {
+                    var data = response.data;
+                    var allResultsElement = document.getElementById('allResults');
+                    var tableHtml = '<table class="results-table"><tr><th>생년월일</th><th>첫 번째 컬러</th><th>두 번째 컬러</th><th>세 번째 컬러</th></tr>';
+                    data.forEach(function(item) {
+                        tableHtml += '<tr>';
+                        tableHtml += '<td>' + item.birthdate + '</td>';
+                        tableHtml += '<td>' +
+                            '<div class="color-name-box" style="background-color: ' + item.first_color_color_1 + ';">' + item.first_color_name_1 + '</div>' +
+                            '<div class="color-name-box" style="background-color: ' + item.first_color_color_2 + ';">' + item.first_color_name_2 + '</div>' +
+                            '</td>';
+                        tableHtml += '<td>' +
+                            '<div class="color-name-box" style="background-color: ' + item.second_color_color_1 + ';">' + item.second_color_name_1 + '</div>' +
+                            '<div class="color-name-box" style="background-color: ' + item.second_color_color_2 + ';">' + item.second_color_name_2 + '</div>' +
+                            '</td>';
+                        tableHtml += '<td>' +
+                            '<div class="color-name-box" style="background-color: ' + item.third_color_color_1 + ';">' + item.third_color_name_1 + '</div>' +
+                            '<div class="color-name-box" style="background-color: ' + item.third_color_color_2 + ';">' + item.third_color_name_2 + '</div>' +
+                            '</td>';
+                        tableHtml += '</tr>';
+                    });
+                    tableHtml += '</table>';
+                    allResultsElement.innerHTML = tableHtml;
+                })
+                .catch(function (error) {
+                    console.error('Error:', error);
+                });
+        }
+
+        function clearResults() {
+            var apiUrl = 'https://your-heroku-app-name.herokuapp.com/clear_results'; // Heroku 앱 URL 사용
+            axios.post(apiUrl)
+                .then(function () {
+                    document.getElementById('allResults').innerHTML = '';
+                    alert('결과가 초기화되었습니다.');
                 })
                 .catch(function (error) {
                     console.error('Error:', error);
@@ -42,10 +133,12 @@
     <div>
         <label for="birthdate">생년월일(YYYYMMDD):</label>
         <input type="text" id="birthdate" name="birthdate" pattern="[0-9]{8}" title="8자리 숫자를 입력하세요 (예: 20230101)" required>
-        <br><br>
         <button type="button" onclick="calculateColors()">계산하기</button>
+        <button type="button" onclick="showAllResults()">전체결과</button>
+        <button type="button" onclick="clearResults()">초기화</button>
     </div>
-    
+
     <div id="result"></div>
+    <div id="allResults"></div>
 </body>
 </html>
